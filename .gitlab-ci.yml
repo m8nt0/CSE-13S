@@ -1,23 +1,14 @@
 stages:
-  - build
   - test
 
-ok_to_submit:
-  image: ${TESTING_DOCKER_IMAGE}
-  stage: build
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
-    - when: never
-  script:
-    - curl -Ls ${TESTING_BASE_URL}/${TESTING_SECRET}/check_submission.txt | python3 - ${TESTING_BASE_URL}/${TESTING_SECRET}/cse13s-fall22.toml check
-
-runtests:
+runtest:
   image: ${TESTING_DOCKER_IMAGE}
   stage: test
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "api"
-      when: always
-    - when: never
   script:
-    - curl -Ls ${TESTING_BASE_URL}/${TESTING_SECRET}/check_submission.txt | python3 - ${TESTING_BASE_URL}/${TESTING_SECRET}/cse13s-fall22.toml test test
+    - cd asgn${TESTING_LAB}
+    - git clone https://oauth2:${TESTING_SECRET}@git.ucsc.edu/cse13s_master/cse13s_resources.git
+    - cp ./cse13s_resources/Assignments/asgn${TESTING_LAB}/test_asgn${TESTING_LAB}.py .
+    - python3 test_asgn${TESTING_LAB}.py
+    - /bin/rm -r cse13s_resources/ 
+    - /bin/rm -f test_asgn${TESTING_LAB}.py
+
