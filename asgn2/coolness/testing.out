@@ -1,1 +1,65 @@
+#!/bin/bash
+
+# Zero argument
+./coolness > output.txt
+diff -q output.txt noInputs.txt
+if [ $? -eq 0 ]; then
+  echo "Successful of Matching"
+else
+  echo "Unsuccessful of Matching"
+fi
+Successful of Matching
+
+# Only T
+./coolness 32.0 > output.txt
+diff -q output.txt oneInput.txt
+if [ $? -eq 0 ]; then
+  echo "Successful of Matching"
+else
+  echo "Unsuccessful of Matching"
+fi
+Successful of Matching
+
+# Both T and V provided
+./coolness 32.5 10.0 > output.txt
+diff -q output.txt twoInput.txt
+if [ $? -eq 0 ]; then
+  echo "Successful of Matching"
+else
+  echo "Unsuccessful of Matching"
+fi
+Successful of Matching
+
+# Passed the capstone of TEMP
+# It tests if an error occurs and if it does, it will say succesful
+./coolness 116.0 10.0
+Error: Coolness. Acceptable input values are -99<=T<=50 and 0.5<=V.
+if [ $? -eq 1 ]; then
+  echo "Returned an Error: Successful"
+else
+  echo "Failed: Unsuccessful in returning Error"
+fi
+Returned an Error: Successful
+
+# Didn't surpass the wind limit
+./coolness 25.0 0.2
+Error: Coolness. Acceptable input values are -99<=T<=50 and 0.5<=V.
+if [ $? -eq 1 ]; then
+  echo "Returned an Error: Successful"
+else
+  echo "Failed: Unsuccessful in returning Error"
+fi
+Returned an Error: Successful
+
+# More arguments provided
+./coolness 25.0 10.0 15.0
+Usage: ./coolness [temperature] [wind speed]
+if [ $? -eq 1 ]; then
+  echo "Returned an Error: Successful"
+else
+  echo "Failed: Unsuccessful in returning Error"
+fi
+Returned an Error: Successful
+
+rm -f output.txt
 
