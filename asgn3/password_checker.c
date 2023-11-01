@@ -57,7 +57,6 @@ bool check_password(const char *first_name, const char *last_name, const char *p
     bool length, upper, lower, number, name;
     lower = check_lower(password);
     length = check_length(password);
-    //assert(lower);
     name = check_name(first_name, last_name, password);
     number = check_number(password);
     upper = check_upper(password);
