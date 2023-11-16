@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Wpedantic -Wno-unused-parameter
 TARGET = growing_arrays
-SOURCE = test_growing_arrays.c
+SOURCE = growing_arrays.c
 
 all: $(TARGET)
 
