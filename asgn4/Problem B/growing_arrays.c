@@ -1,4 +1,5 @@
 #include "growing_arrays.h"
+#include "test_growing_arrays.c"
 
 int add_record(Record record) {
     // double the size if full
