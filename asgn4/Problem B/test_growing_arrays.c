@@ -1,5 +1,5 @@
 #include "growing_arrays.h" 
-#include "growing_arrays.c"
+
 // Testing code. You can modify this and check your own test cases.
 struct Table table;
 int main(int argc, char **argv) {
