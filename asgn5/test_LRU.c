@@ -107,7 +107,7 @@ int main(){
   lru_insert(smallLRU, "one","1");
   lru_insert(smallLRU, "two","2");
   lru_insert(smallLRU, "three","3");
-  //assert(!lru_find(smallLRU,"one"));
+  assert(!lru_find(smallLRU,"one"));
   printf("LRU deleted old element succesfully\n");
 	
   lru_delete(smallLRU, NULL);
