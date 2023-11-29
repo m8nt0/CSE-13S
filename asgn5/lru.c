@@ -43,6 +43,60 @@ lru_t *lru_new(const int capacity) {
 
     return to_generate_lru;
 }
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+bool to_delete(set_t *set, const char *key, void (*itemdelete)(void *item)) {
+    if (set == NULL || key == NULL)
+        return false;
+
+    node_pointer *position = set->head;
+    node_pointer *prev = NULL;
+
+    // Go through this algorithm of comparison to find the key
+    while (position != NULL) {
+        if (strcmp(position->key, key) == 0) {
+            // you get to this point when you find the key
+            if (prev == NULL) {
+                // this is the normal expcatation  
+                set->head = position->next;
+            } else {
+                //if we aren't at the head we replace the next of prev with the next next
+                prev->next = position->next;
+            }
+
+            if (itemdelete != NULL)
+                (*itemdelete)(position->item);
+
+            free(position->key);
+            free(position);
+            return true;
+        }
+
+        prev = position;
+        position = position->next;
+    }
+
+    return false; 
+}
+
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void to_print(set_t *set, FILE *fp, void (*itemprint)(FILE *fp, const char *key, void *item)) {
+    if (set == NULL || fp == NULL)
+        return;
+
+    node_pointer *the_lead = set->head;
+    while (the_lead != NULL) {
+        if (itemprint != NULL) {
+            (*itemprint)(fp, the_lead->key, the_lead->item);
+        } else {
+            fprintf(fp, "Key: %s, Item: %p\n", the_lead->key, the_lead->item);
+        }
+        the_lead = the_lead->next;
+    }
+}
+
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -51,11 +105,20 @@ void hashtable_delete_key(hashtable_t *ht, const char *key) {
     if (ht == NULL || key == NULL) {
         return;
     }
+    
+    
 
     unsigned int position = hashtable_hash(key, ht->num_slots); //using the hashtable_hash to determine the index of the key
-
+    
     if (ht->buckets[position] != NULL) {
-        set_delete(ht->buckets[position], NULL); // using set_delete and having NULL to not assoicate with delRecord only available in the other test cases
+        //printf("Before Deletion - Hashtable Bucket [%u]:\n", position);
+        //to_print(ht->buckets[position], stdout, NULL); // Print contents of the bucket before deletion
+        
+        to_delete(ht->buckets[position], key, NULL); // Delete the node associated with the key
+        
+        //printf("After Deletion - Hashtable Bucket [%u]:\n", position);
+        //to_print(ht->buckets[position], stdout, NULL); // Print contents of the bucket after deletion
+        //set_delete(ht->buckets[position], NULL); // using set_delete and having NULL to not assoicate with delRecord only available in the other test cases
     }
 }
 
@@ -73,8 +136,7 @@ void lru_evict(lru_t *lru) {
     if (lru->cache_tail != NULL) {
         lru->cache_tail->next_node = NULL;
     }
-    
-
+   
     
     // using hashtable_delete_key from hashtable consequently using set_delete from set.c
     if (sub != NULL && sub->key != NULL) {
@@ -85,10 +147,10 @@ void lru_evict(lru_t *lru) {
 
 
     
-    //free(sub->key);
+    free(sub->key);
     
     //free(sub->item);
-    //free(sub);
+    free(sub);
     lru->num_size--;
     
 
@@ -102,6 +164,8 @@ bool lru_insert(lru_t *lru, const char *key, void *item) {
     if (lru == NULL || key == NULL || item == NULL) {
         return false;// if it is NULL
     }
+    
+    
 
     // to see if it existist (key) and leave false
     void *existing_item = hashtable_find(lru->hashtable_, key);
@@ -110,6 +174,9 @@ bool lru_insert(lru_t *lru, const char *key, void *item) {
         // duplicate keys
         return false;
     }
+    
+    //free(to_generate_node->key);
+    //free(to_generate_node);
 
     // if not we don't find it in the hashtable then we allocate
     LRUCache_Node *to_generate_node = (LRUCache_Node *)malloc(sizeof(LRUCache_Node));
@@ -137,12 +204,15 @@ bool lru_insert(lru_t *lru, const char *key, void *item) {
     hashtable_insert(lru->hashtable_, key, item);
     lru->num_size++;//increment it to see it surpoassed the capcity
     
-    
+    //printf("Node inserted - Key: %s, Item: %p\n", key, item);
 
     // if it surpassed we go to evict mode: activated!!!
     if (lru->num_size > lru->capacity) {
+        
         lru_evict(lru);
     }
+    //free(to_generate_node->key);
+    //free(to_generate_node);
 
     return true;
 }
@@ -243,8 +313,8 @@ void lru_delete(lru_t *lru, void (*itemdelete)(void *item)) {
         }
         
        
-        //free(sub->key);
-        //free(sub);
+        free(sub->key);
+        free(sub);
     }
 
     // doing the deletion of the hashtable
