@@ -20,6 +20,7 @@ hashtable_t *hashtable_new(const int num_slots) {
         
         generate_new_ht->buckets = (set_t **)malloc(num_slots * sizeof(set_t *)); // simple allocation of buckets
         if (generate_new_ht->buckets == NULL) {
+            //free(generate_new_ht->buckets);
             free(generate_new_ht);
             return NULL;// If it fails
         }
@@ -108,11 +109,13 @@ void hashtable_delete(hashtable_t *ht, void (*itemdelete)(void *item)) {
     } else {
         for (int i = 0; i < ht->num_slots; ++i) {
              if (ht->buckets[i] != NULL) {
-                 break;
+                 //i think it is here
+                 //printf("i think it is here\n");
+                 set_delete(ht->buckets[i], NULL);
              }
         }
     }   
-
+    //free(ht->generate_new_ht);
     free(ht->buckets);// free the allocated hashtable as well as each buckets
     free(ht);
 }
